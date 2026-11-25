@@ -92,27 +92,26 @@ function viewAgents() {
     ${s.agents.length < 4 ? `<button class="add" data-addrole="1"><span class="plus">+</span>Add a role</button>` : ""}</div></section>`;
 }
 
-function config() {
-  const s = sc();
-  return { scenario: s.id, name: s.name, mode: state.mode === "sim" ? "simulation" : "practice", maxRounds: s.rounds,
-    agents: s.agents.map((a, i) => { const human = state.mode === "prac" && state.you === i, p = PERSONALITIES[state.pers[a.id]];
-      return { id: a.id, role: a.role, controlledBy: human ? "human" : "ai", goals: a.wants, constraints: a.limits, fallback: a.fallback,
-        personality: human ? null : state.pers[a.id], style: human ? null : { opening: p.open, concessionSpeed: p.pace, flexibility: p.flex, walkAway: p.walk } }; }) };
-}
-
 function viewReview() {
-  const s = sc(), c = config();
-  return `<section class="page"><h1>Review and start</h1><p class="sub">Check the setup. This is what the orchestrator will receive.</p>
-  <div class="rev"><div class="sum" style="--c:${s.color}">${scene(s, "sm")}
-    <h2>${esc(s.name)}</h2><p class="sub">${esc(s.topic)}</p>
-    <dl><dt>Mode</dt><dd>${state.mode === "sim" ? "Simulation (AI vs AI)" : "Practice (you vs AI)"}</dd><dt>Max rounds</dt><dd>${s.rounds}</dd></dl>
-    <ul class="who">${s.agents.map((a, i) => { const h = state.mode === "prac" && state.you === i; return `<li style="--c:${a.color}"><span class="av">${esc(a.emoji)}</span><div><b>${esc(a.role)}</b><small>${h ? "You" : PERSONALITIES[state.pers[a.id]].name}</small></div></li>`; }).join("")}</ul></div>
-    <div class="code"><div class="ch"><b>negotiation-config.json</b><button class="ghost" id="copy">Copy</button></div><pre>${esc(JSON.stringify(c, null, 2))}</pre></div></div></section>`;
+  const s = sc(), prac = state.mode === "prac";
+  const who = (a, i) => (prac && state.you === i) ? "You (human)" : PERSONALITIES[state.pers[a.id]].icon + " " + PERSONALITIES[state.pers[a.id]].name + " AI";
+  const names = s.agents.map((a) => `<b>${esc(a.role)}</b>`);
+  const list = names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0];
+  const li = (arr) => arr.length ? `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "–";
+  return `<section class="page"><h1>Setup summary</h1><p class="sub">Check the details, then start the negotiation.</p>
+  <div class="brief" style="--c:${s.color}">
+    <h2>${esc(s.icon)} ${esc(s.name)}</h2>
+    <p>${prac ? "In <b>Practice mode</b>, you negotiate against AI agents." : "In <b>Simulation mode</b>, AI agents negotiate with each other while you watch."} The parties are ${list}, negotiating over <b>${esc(s.topic.toLowerCase())}</b>. The session runs for up to <b>${s.rounds} rounds</b> and ends earlier if someone accepts or rejects a deal.</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Role</th><th>Played by</th><th>Wants</th><th>Won’t cross</th><th>Fallback</th></tr></thead>
+    <tbody>${s.agents.map((a, i) => `<tr style="--c:${a.color}"><td class="rl"><span class="dot">${esc(a.emoji)}</span><div><b>${esc(a.role)}</b><small>${esc(a.side)}</small></div></td><td>${who(a, i)}</td><td>${li(a.wants)}</td><td>${li(a.limits)}</td><td>${esc(a.fallback)}</td></tr>`).join("")}</tbody>
+  </table></div></section>`;
 }
 
 function renderBar() {
   const off = state.step === 0 && state.sc === null, labels = ["Continue to agents", "Review setup", "Start negotiation"];
-  $("#bar").innerHTML = `${state.step > 0 ? `<button class="ghost" data-nav="-1">Back</button>` : "<span></span>"}<span class="hint">${off ? "Select a scenario to continue" : state.step === 2 ? "Arena launches here in the next milestone" : ""}</span><button class="primary" data-nav="1" ${off ? "disabled" : ""}>${labels[state.step]}</button>`;
+  $("#bar").innerHTML = `${state.step > 0 ? `<button class="ghost" data-nav="-1">Back</button>` : "<span></span>"}<span class="hint">${off ? "Select a scenario to continue" : state.step === 2 ? "Everything looks good? Start when ready" : ""}</span><button class="primary" data-nav="1" ${off ? "disabled" : ""}>${labels[state.step]}</button>`;
 }
 
 function render() {
@@ -132,7 +131,6 @@ document.addEventListener("click", (e) => {
   if (d.m) { state.mode = d.m; return render(); }
   if (d.you) { state.you = +d.you; return render(); }
   if (d.p) { state.pers[d.a] = d.p; return render(); }
-  if (t.id === "copy") { navigator.clipboard && navigator.clipboard.writeText(JSON.stringify(config(), null, 2)); return toast("Configuration copied"); }
   if (d.nav) {
     if (state.step === 2 && d.nav === "1") return toast("Setup complete. The Negotiation Arena opens here.");
     state.step += +d.nav; render(); window.scrollTo({ top: 0, behavior: "smooth" });

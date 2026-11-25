@@ -91,3 +91,19 @@ dialog input:focus,dialog textarea:focus,dialog select:focus{outline:none;border
 .emo input:checked+span{border-color:var(--amber);background:#FFC24722}.emo input:focus-visible+span{outline:3px solid var(--amber)}
 .err{color:var(--coral);font-weight:700;min-height:22px;margin:10px 0 0}.note{color:var(--mute);font-size:14px;margin:12px 0 0}
 .acts{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+
+.sumhead{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:20px;align-items:center;background:var(--panel);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:22px;padding:16px;margin-bottom:18px}
+.sumhead h2{font-size:24px;margin-bottom:2px}.sumhead p{color:var(--mute);margin:0 0 10px}
+.chip{margin-left:auto;background:var(--panel2);border:1px solid var(--line);padding:4px 12px;border-radius:99px;font-weight:700;font-size:13px;white-space:nowrap}
+.sumhead .scene{margin:0}
+@media(max-width:700px){.sumhead{grid-template-columns:1fr}}
+
+.brief{background:var(--panel);border:1px solid var(--line);border-left:8px solid var(--c);border-radius:20px;padding:18px 22px;margin-bottom:18px}
+.brief h2{font-size:24px;margin-bottom:6px}.brief p{margin:0;max-width:760px}
+.tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:15px}
+th{text-align:left;padding:12px 14px;background:var(--panel2);font:700 13px Sora,sans-serif;color:var(--mute)}
+td{padding:14px;border-top:1px solid var(--line);vertical-align:top}
+td ul{padding-left:18px;margin:0;list-style:disc}td li{padding:0;margin:2px 0}td li::before{content:none}
+.rl{display:flex;gap:10px;align-items:center;min-width:170px}.rl small{display:block;color:var(--mute)}
+.dot{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 28%,var(--panel));border:3px solid var(--c);font-size:20px;flex:none}
